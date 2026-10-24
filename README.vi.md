@@ -84,7 +84,7 @@ Trên TV, mở **Homebrew Channel → Settings (⚙)**, bật:
 
 Kiểm tra **Root status** là **ok**, rồi bấm **System reboot**.
 
-<!-- <img src="docs/media/homebrew-settings.jpg" alt="Cài đặt Homebrew Channel" width="600"> -->
+<img src="docs/media/homebrew-settings.jpg" alt="Cài đặt Homebrew Channel" width="300">
 
 Xem IP của TV: **Cài đặt → Mạng → (Wi-Fi hoặc Có dây) → Nâng cao**. IP có dạng `192.168.1.50`.
 

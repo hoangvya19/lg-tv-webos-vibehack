@@ -86,7 +86,7 @@ On the TV, open **Homebrew Channel → Settings (⚙)** and turn on:
 
 Check that **Root status** says **ok**, then press **System reboot**.
 
-<!-- <img src="docs/media/homebrew-settings.jpg" alt="Homebrew Channel settings" width="600"> -->
+<img src="docs/media/homebrew-settings.jpg" alt="Homebrew Channel settings" width="300">
 
 Find the TV's IP address: **Settings → Network → (Wi-Fi or Wired) → Advanced**. It looks like `192.168.1.50`.
 
