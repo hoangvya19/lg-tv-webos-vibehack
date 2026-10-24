@@ -86,7 +86,7 @@ On the TV, open **Homebrew Channel → Settings (⚙)** and turn on:
 
 Check that **Root status** says **ok**, then press **System reboot**.
 
-<img src="docs/media/homebrew-settings.jpg" alt="Homebrew Channel settings" width="600">
+<!-- <img src="docs/media/homebrew-settings.jpg" alt="Homebrew Channel settings" width="600"> -->
 
 Find the TV's IP address: **Settings → Network → (Wi-Fi or Wired) → Advanced**. It looks like `192.168.1.50`.
 
@@ -361,10 +361,15 @@ This project stands on the work of others. Thank you:
 
 If this made your TV nicer, a ⭐ on the repo helps others find it.
 
-<!-- Add your links here, e.g.
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff5e5b?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/yourname)
-[![Facebook](https://img.shields.io/badge/Facebook-follow-1877f2?style=flat-square&logo=facebook&logoColor=white)](https://facebook.com/yourpage)
--->
+Want to buy me a coffee? Donations in **USDT on BNB Smart Chain (BEP20)** are welcome:
+
+<img src="docs/media/donate-usdt-bsc.gif" alt="USDT BEP20 donation address QR code" width="180">
+
+```
+0x11a0cd4c3e0135d2af5dc0ad0d44bc535fe4645b
+```
+
+⚠️ Send **USDT on the BNB Smart Chain (BEP20) network only**. Coins sent on another network are lost.
 
 ## Disclaimer
 

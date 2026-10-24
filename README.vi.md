@@ -84,7 +84,7 @@ Trên TV, mở **Homebrew Channel → Settings (⚙)**, bật:
 
 Kiểm tra **Root status** là **ok**, rồi bấm **System reboot**.
 
-<img src="docs/media/homebrew-settings.jpg" alt="Cài đặt Homebrew Channel" width="600">
+<!-- <img src="docs/media/homebrew-settings.jpg" alt="Cài đặt Homebrew Channel" width="600"> -->
 
 Xem IP của TV: **Cài đặt → Mạng → (Wi-Fi hoặc Có dây) → Nâng cao**. IP có dạng `192.168.1.50`.
 
@@ -335,7 +335,15 @@ Project này được xây trên công sức của nhiều người. Xin cảm �
 
 Nếu project giúp TV của bạn đẹp hơn, một ⭐ cho repo sẽ giúp người khác tìm thấy nó.
 
-<!-- Thêm link của bạn ở đây -->
+Muốn mời mình ly cà phê? Ủng hộ bằng **USDT mạng BNB Smart Chain (BEP20)**:
+
+<img src="docs/media/donate-usdt-bsc.gif" alt="Mã QR địa chỉ ủng hộ USDT BEP20" width="180">
+
+```
+0x11a0cd4c3e0135d2af5dc0ad0d44bc535fe4645b
+```
+
+⚠️ Chỉ gửi **USDT trên mạng BNB Smart Chain (BEP20)**. Gửi nhầm mạng khác sẽ mất tiền.
 
 ## Miễn trừ trách nhiệm
 

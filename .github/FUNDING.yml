@@ -1,5 +1,2 @@
-# Shows a "Sponsor" button on the repository page. Fill in what you use, delete the rest.
-# github: hoangvya19
-# ko_fi: your_kofi_name
-# buy_me_a_coffee: your_bmc_name
-# custom: ["https://your-donate-link.example"]
+# Shows a "Sponsor" button on the repository page, linking to the donation section of the README.
+custom: ["https://github.com/hoangvya19/lg-tv-vibehack#support"]
