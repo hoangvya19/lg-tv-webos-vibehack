@@ -42,7 +42,8 @@
 - **4 đến 10 ô mỗi hàng:** bấm cây bút cạnh hàng dock rồi chọn số.
 - **Tự mở khi bật TV** (TV đã root), kể cả khi TV bật lên vào truyền hình.
 - **Danh sách app tự cập nhật** (TV đã root): cài hay xoá app, khởi động lại TV là launcher tự cập nhật.
-- **Sắp xếp ô bằng remote:** giữ OK, di chuyển, bấm OK.
+- **Sắp xếp app dễ dàng:** bấm cây bút cạnh dock → **Sắp xếp ứng dụng**, bấm vào app, trỏ tới chỗ mới
+  rồi bấm lần nữa. Hoặc giữ OK trên 1 ô (dùng được cả con trỏ lẫn phím mũi tên).
 - **Không theo dõi, không quảng cáo, không tài khoản.** Chỉ dùng HTML, CSS, JavaScript.
 
 <p align="center">

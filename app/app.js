@@ -46,7 +46,8 @@
       inputs: 'Inputs', settings: 'Settings', wired: 'Ethernet', offline: 'Offline', liveTv: 'Live TV',
       noInputs: 'No inputs found', cantOpen: "Can't open ", ampm: ['am', 'pm'],
       moveHint: 'Arrows or pointer to move  ·  OK to place  ·  Back to cancel',
-      colsTitle: 'Tiles per row',
+      colsTitle: 'Tiles per row', arrange: 'Rearrange apps', done: 'Done',
+      arrangeHint: 'Click an app to pick it up, point where it should go, click again to drop it.',
       wallTitle: 'Change wallpaper',
       wallScan: 'Scan this code with your phone camera, then pick a photo.',
       wallOff: 'The wallpaper page is not running. Reboot the TV and try again.'
@@ -58,7 +59,8 @@
       inputs: 'Nguồn vào', settings: 'Cài đặt', wired: 'Wi-Fi', offline: 'Mất mạng', liveTv: 'Truyền hình',
       noInputs: 'Không tìm thấy nguồn vào', cantOpen: 'Không mở được ', ampm: ['SA', 'CH'],
       moveHint: 'Mũi tên hoặc con trỏ để di chuyển  ·  OK để đặt  ·  Back để huỷ',
-      colsTitle: 'Số ô mỗi hàng',
+      colsTitle: 'Số ô mỗi hàng', arrange: 'Sắp xếp ứng dụng', done: 'Xong',
+      arrangeHint: 'Bấm vào app để nhấc lên, trỏ tới chỗ mới rồi bấm lần nữa để đặt.',
       wallTitle: 'Đổi hình nền',
       wallScan: 'Quét mã này bằng camera điện thoại rồi chọn ảnh.',
       wallOff: 'Trang đổi hình nền chưa chạy. Khởi động lại TV rồi thử lại.'
@@ -68,6 +70,7 @@
   var GREETINGS = L.greetings;
 
   var ICON_INPUT = 'M18,7V4c0,-1.1 -0.9,-2 -2,-2H8C6.9,2 6,2.9 6,4v3H5v6l3,6v3h8v-3l3,-6V7H18zM8,4h8v3h-2V5h-1v2h-2V5h-1v2H8V4z';
+  var ICON_MOVE = 'M10,9h4V6h3l-5,-5 -5,5h3v3zM9,10H6V7l-5,5 5,5v-3h3v-4zM23,12l-5,-5v3h-3v4h3v3l5,-5zM14,15h-4v3H7l5,5 5,-5h-3v-3z';
   var ICON_LIVETV = 'M21,6h-7.59l3.29,-3.29L16,2l-4,4l-4,-4l-0.71,0.71L10.59,6H3c-1.1,0 -2,0.89 -2,2v12c0,1.1 0.9,2 2,2h18c1.1,0 2,-0.89 2,-2V8C23,6.89 22.1,6 21,6zM21,20H3V8h18V20zM9,10v8l7,-4L9,10z';
 
   var $ = function (id) { return document.getElementById(id); };
@@ -78,7 +81,8 @@
 
   var items = [];               // {app, el, color}
   var zone = 'grid';            // 'grid' | 'top' | 'inputs' | 'wall' | 'pen' | 'cols'
-  var colFocus = 0, colCells = [];
+  var colFocus = 0, colCells = [], colRow = 0, arrangeBtn = null;
+  var arranging = false;        // "Rearrange apps" mode from the pencil: every tile wiggles
   var focused = 0, pillFocus = 0, inputFocus = 0, inputRows = [];
   var offset = 0, heroShown = false, glassShown = false;
   var editing = null;           // {item, snapshot} while a tile is being moved
@@ -196,7 +200,7 @@
       // With the Magic Remote pointer, holding OK sends mousedown ... mouseup + click (no OK key),
       // so a long press is timed here too, and the click that ends it is ignored.
       el.addEventListener('mousedown', function () {
-        if (editing || zone === 'inputs' || zone === 'wall' || zone === 'cols') return;
+        if (editing || arranging || zone === 'inputs' || zone === 'wall' || zone === 'cols') return;
         clearTimeout(pressTimer);
         pressTimer = setTimeout(function () {
           pressTimer = null;
@@ -210,6 +214,7 @@
       el.addEventListener('click', function () {
         if (pressedLong) { pressedLong = false; return; }
         if (editing) finishEdit(true);
+        else if (arranging) { focusTile(items.indexOf(item)); startEdit(); }
         else launch(app.id, app.title);
       });
       tilesEl.appendChild(el);
@@ -585,6 +590,13 @@
       return c;
     });
     colsPanel.appendChild(row);
+    arrangeBtn = document.createElement('div');
+    arrangeBtn.className = 'arrangeBtn';
+    arrangeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="' + ICON_MOVE + '"/></svg>';
+    arrangeBtn.appendChild(document.createTextNode(L.arrange));
+    arrangeBtn.addEventListener('mouseover', function () { focusArrangeBtn(); });
+    arrangeBtn.addEventListener('click', function () { startArrange(); });
+    colsPanel.appendChild(arrangeBtn);
 
     // Above the dock, right-aligned with the pencil.
     var r = pen.getBoundingClientRect();
@@ -598,8 +610,35 @@
 
   function focusCol(i) {
     if (colCells[colFocus]) colCells[colFocus].classList.remove('focused');
+    arrangeBtn.classList.remove('focused');
+    colRow = 0;
     colFocus = Math.max(0, Math.min(i, colCells.length - 1));
     colCells[colFocus].classList.add('focused');
+  }
+
+  function focusArrangeBtn() {
+    if (colCells[colFocus]) colCells[colFocus].classList.remove('focused');
+    colRow = 1;
+    arrangeBtn.classList.add('focused');
+  }
+
+  // ---- "Rearrange apps": click an app to pick it up, point, click to drop; Done or Back ends ----
+
+  function startArrange() {
+    colsPanel.classList.add('hidden');
+    arranging = true;
+    document.body.classList.add('arranging');
+    $('arrangeText').textContent = L.arrangeHint;
+    $('arrangeDone').textContent = L.done;
+    zone = 'none';
+    focusTile(Math.min(focused, items.length - 1));
+  }
+
+  function stopArrange() {
+    if (editing) finishEdit(true);
+    arranging = false;
+    document.body.classList.remove('arranging');
+    focusTile(focused);
   }
 
   function hideCols() {
@@ -673,7 +712,7 @@
     editing = { item: it, snapshot: items.slice() };
     it.el.classList.add('moving');
     document.body.classList.add('editing');
-    toast(L.moveHint);
+    if (!arranging) toast(L.moveHint);
   }
 
   function moveTo(to) {
@@ -733,11 +772,13 @@
       else if (k === KEY.BACK || k === KEY.ESC || k === KEY.LEFT || k === KEY.RIGHT) hideInputs();
       else return;
     } else if (zone === 'cols') {
-      if (k === KEY.LEFT) focusCol(colFocus - 1);
-      else if (k === KEY.RIGHT) focusCol(colFocus + 1);
-      else if (k === KEY.OK) applyCols(COLS_CHOICES[colFocus]);
+      if (k === KEY.LEFT && colRow === 0) focusCol(colFocus - 1);
+      else if (k === KEY.RIGHT && colRow === 0) focusCol(colFocus + 1);
+      else if (k === KEY.DOWN && colRow === 0) focusArrangeBtn();
+      else if (k === KEY.UP && colRow === 1) focusCol(colFocus);
+      else if (k === KEY.OK) { if (colRow === 1) startArrange(); else applyCols(COLS_CHOICES[colFocus]); }
       else if (k === KEY.BACK || k === KEY.ESC || k === KEY.UP || k === KEY.DOWN) hideCols();
-      else return;
+      else if (k !== KEY.LEFT && k !== KEY.RIGHT) return;
     } else if (zone === 'pen') {
       if (k === KEY.LEFT) focusTile(lastDock());
       else if (k === KEY.UP) focusPill(pills.length - 1);
@@ -758,13 +799,15 @@
       else return;
     } else {
       var col = focused % COLUMNS, last = items.length - 1;
+      if (arranging && k === KEY.OK) { startEdit(); e.preventDefault(); return; }
+      if (arranging && (k === KEY.BACK || k === KEY.ESC)) { stopArrange(); e.preventDefault(); return; }
       if (k === KEY.LEFT) { if (col > 0) focusTile(focused - 1); }
       else if (k === KEY.RIGHT) {
         if (col < COLUMNS - 1 && focused < last) focusTile(focused + 1);
-        else if (focused === lastDock()) focusPen();
+        else if (focused === lastDock() && !arranging) focusPen();
       }
       else if (k === KEY.UP) {
-        if (rowOf(focused) === 0) focusPill(pillAbove(focused));
+        if (rowOf(focused) === 0) { if (!arranging) focusPill(pillAbove(focused)); }
         else focusTile(focused - COLUMNS);
       } else if (k === KEY.DOWN) {
         if (rowOf(focused) < rowOf(last)) focusTile(Math.min(focused + COLUMNS, last));
@@ -776,8 +819,9 @@
     e.preventDefault();
   });
 
-  pen.addEventListener('mouseover', function () { if (zone !== 'inputs' && zone !== 'wall' && zone !== 'cols' && !editing) focusPen(); });
-  pen.addEventListener('click', function () { if (!editing) showCols(); });
+  pen.addEventListener('mouseover', function () { if (zone !== 'inputs' && zone !== 'wall' && zone !== 'cols' && !editing && !arranging) focusPen(); });
+  pen.addEventListener('click', function () { if (!editing && !arranging) showCols(); });
+  $('arrangeDone').addEventListener('click', stopArrange);
 
   pills.forEach(function (p, i) {
     p.addEventListener('mouseover', function () { if (zone !== 'inputs' && zone !== 'wall' && zone !== 'cols') focusPill(i); });
@@ -789,6 +833,7 @@
   /** Back from another app (or opened again from the shortcut): replay the entrance, keep the tile. */
   function resume() {
     if (editing) finishEdit(false);
+    if (arranging) { arranging = false; document.body.classList.remove('arranging'); }
     updateClock();
     if (zone === 'inputs') panel.classList.add('hidden');
     if (zone === 'wall') wallPanel.classList.add('hidden');

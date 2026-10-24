@@ -44,7 +44,8 @@
 - **4 to 10 tiles per row:** press the pencil next to the dock and pick a number.
 - **Opens by itself when the TV turns on** (rooted TVs), even if the TV starts on Live TV.
 - **Apps stay in sync by themselves** (rooted TVs): install or remove an app and the launcher updates at the next boot.
-- **Rearrange tiles** with the remote: hold OK, move, press OK.
+- **Rearrange tiles** the easy way: pencil next to the dock → **Rearrange apps**, then click an app,
+  point where it should go and click again. Or hold OK on a tile (works with the pointer and the arrows).
 - **No tracking, no ads, no account.** Plain HTML, CSS and JavaScript.
 
 <p align="center">

@@ -402,3 +402,53 @@ body.editing #penBtn { opacity: 0.3; }
 }
 .colCell.current { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); }
 .colCell.focused { background: rgba(255, 255, 255, 0.96); color: #000; }
+
+/* "Rearrange apps": every tile wiggles gently, the header makes room for the instructions. */
+.arrangeBtn {
+  display: flex;
+  align-items: center;
+  height: 76px;
+  margin-top: 18px;
+  padding: 0 24px;
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  font-size: 30px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.arrangeBtn svg { width: 38px; height: 38px; margin-right: 16px; fill: currentColor; }
+.arrangeBtn.focused { background: rgba(255, 255, 255, 0.96); border-color: transparent; color: #000; }
+
+#arrangeBar {
+  position: absolute;
+  z-index: 6;
+  top: 70px;
+  left: 112px;
+  right: 112px;
+  display: none;
+  align-items: center;
+  padding: 22px 22px 22px 40px;
+  border-radius: 44px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(30, 30, 34, 0.94);
+  font-size: 32px;
+  line-height: 1.3;
+}
+body.arranging #arrangeBar { display: flex; }
+#arrangeText { flex: 1; margin-right: 32px; }
+#arrangeDone {
+  padding: 18px 48px;
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #000;
+  font-weight: 600;
+  white-space: nowrap;
+}
+body.arranging header { opacity: 0; pointer-events: none; }
+body.arranging #penBtn { opacity: 0.3; }
+body.arranging .item:not(.moving):not(.focused) .card { animation: jiggle 260ms ease-in-out infinite alternate; }
+body.arranging .item:nth-child(even):not(.moving):not(.focused) .card { animation-delay: -130ms; }
+@keyframes jiggle {
+  from { transform: rotate(-1deg); }
+  to { transform: rotate(1deg); }
+}
