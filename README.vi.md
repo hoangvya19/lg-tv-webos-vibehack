@@ -9,6 +9,7 @@
 [![Release](https://img.shields.io/github/v/release/hoangvya19/lg-tv-webos-vibehack?style=flat-square)](https://github.com/hoangvya19/lg-tv-webos-vibehack/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![webOS](https://img.shields.io/badge/webOS-6%2B-a50034?style=flat-square)](#tv-đã-thử-nghiệm)
+[![Root](https://img.shields.io/badge/root-optional-555?style=flat-square)](#root-hay-không-root)
 
 [English](README.md) · **Tiếng Việt**
 
@@ -28,7 +29,9 @@
 - [Cài thêm app từ Homebrew Channel](#cài-thêm-app-từ-homebrew-channel)
 - [Xử lý sự cố](#xử-lý-sự-cố)
 - [Gỡ cài đặt](#gỡ-cài-đặt)
+- [TV đã thử nghiệm](#tv-đã-thử-nghiệm)
 - [Cảm ơn](#cảm-ơn)
+- [Ủng hộ](#ủng-hộ)
 
 ## Tính năng
 
@@ -129,7 +132,8 @@ Xem đủ tuỳ chọn ở phần [Tuỳ chỉnh](#tuỳ-chỉnh-hình-nền-th�
 
 > **Bảo mật:** mật khẩu root `alpine` không đổi được trên webOS (hệ thống chỉ đọc). Thay vào đó
 > dùng SSH key như chính thông báo đăng nhập của TV khuyên: chạy `ssh-copy-id root@192.168.1.50`
-> trên máy tính, rồi khởi động lại TV.
+> trên máy tính 1 lần. Nhớ **tắt Telnet** trong cài đặt Homebrew Channel: nó cho bất kỳ ai cùng mạng
+> vào quyền root mà không cần mật khẩu.
 
 ## Cài không cần root
 
@@ -254,6 +258,13 @@ Không root: chạy lại `./install-noroot.sh`.
 2. Khởi động lại TV 1 lần sau khi cài.
 3. Kiểm tra watcher: `ps -ef | grep homewatch` phải thấy một tiến trình `node`.
 4. Xem log: `tail -30 /tmp/lg-tv-vibehack.log`
+</details>
+
+<details>
+<summary><b>Bật TV lên thấy truyền hình hoặc Home LG vài giây rồi mới vào launcher</b></summary>
+
+Bình thường. webOS mở màn hình của nó trước, launcher sẽ chiếm lại ngay khi webOS sẵn sàng
+(thường vài giây, lâu hơn nếu đang có bảng thông báo của LG như thông báo cập nhật phần mềm).
 </details>
 
 <details>

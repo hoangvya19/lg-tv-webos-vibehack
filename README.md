@@ -29,7 +29,9 @@
 - [Get more apps from the Homebrew Channel](#get-more-apps-from-the-homebrew-channel)
 - [Troubleshooting](#troubleshooting)
 - [Uninstall](#uninstall)
+- [Tested TVs](#tested-tvs)
 - [Credits](#credits)
+- [Support](#support)
 
 ## Features
 
@@ -94,7 +96,8 @@ Find the TV's IP address: **Settings → Network → (Wi-Fi or Wired) → Advanc
 ### 2. (Optional) Install LG Input Hook
 
 For the **Home button** to open the launcher, install **LG Input Hook** from the Homebrew Channel
-and open it once. You can skip this; the installer works without it.
+and open it once. You can skip this; the installer works without it, but then Home briefly shows
+LG's home before switching to the launcher.
 
 ### 3. Run one command
 
@@ -131,7 +134,8 @@ All options are in [Customise](#customise-wallpaper-weather-language).
 
 > **Security tip:** the root password `alpine` cannot be changed on webOS (the system is read-only).
 > Use an SSH key instead, as the TV's own login message recommends: run `ssh-copy-id root@192.168.1.50`
-> on your computer, then reboot the TV.
+> on your computer once. Also turn **Telnet off** in the Homebrew Channel settings: it gives a root
+> shell with no password to anyone on your network.
 
 ## Install without root
 
@@ -258,6 +262,13 @@ No root: run `./install-noroot.sh` again.
 2. Reboot the TV once after installing.
 3. Check the watcher: `ps -ef | grep homewatch` should show a `node` process.
 4. Log: `tail -30 /tmp/lg-tv-vibehack.log`
+</details>
+
+<details>
+<summary><b>At power-on I see Live TV or LG's home for a few seconds first</b></summary>
+
+Normal. webOS starts its own screen first; the launcher takes over as soon as webOS is ready
+(usually a few seconds, longer if an LG pop-up such as a software update notice is showing).
 </details>
 
 <details>
