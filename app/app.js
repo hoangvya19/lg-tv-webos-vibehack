@@ -55,7 +55,7 @@
       greetings: [[5, 'Chúc ngủ ngon'], [11, 'Chào buổi sáng'], [13, 'Chào buổi trưa'], [18, 'Chào buổi chiều'], [22, 'Chào buổi tối'], [24, 'Chúc ngủ ngon']],
       days: ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'],
       date: function (d) { return this.days[d.getDay()] + ', ' + d.getDate() + ' tháng ' + (d.getMonth() + 1); },
-      inputs: 'Nguồn vào', settings: 'Cài đặt', wired: 'Mạng dây', offline: 'Mất mạng', liveTv: 'Truyền hình',
+      inputs: 'Nguồn vào', settings: 'Cài đặt', wired: 'Wi-Fi', offline: 'Mất mạng', liveTv: 'Truyền hình',
       noInputs: 'Không tìm thấy nguồn vào', cantOpen: 'Không mở được ', ampm: ['SA', 'CH'],
       moveHint: 'Mũi tên để di chuyển  ·  OK để đặt  ·  Back để huỷ',
       colsTitle: 'Số ô mỗi hàng',
