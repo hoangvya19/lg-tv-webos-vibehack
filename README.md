@@ -319,6 +319,7 @@ reboot
 | Model | webOS | Mode | Status |
 |---|---|---|---|
 | 55NANO77TPA | 6 (firmware 03.51.15) | Root | ✅ |
+| OLED55C6XLA | 26 | No root | ✅ |
 
 Tested yours? Open an issue or a pull request to add it here.
 

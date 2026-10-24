@@ -315,6 +315,7 @@ reboot
 | Model | webOS | Chế độ | Trạng thái |
 |---|---|---|---|
 | 55NANO77TPA | 6 (firmware 03.51.15) | Root | ✅ |
+| OLED55C6XLA | 26 | Không root | ✅ |
 
 Bạn đã thử trên TV khác? Tạo issue hoặc pull request để bổ sung vào bảng.
 
