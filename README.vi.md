@@ -6,7 +6,7 @@
 
 *LG TV-vibehack · webOS-vibehack · LG-vibehack: launcher thay thế màn hình Home đầy quảng cáo của LG.*
 
-[![Release](https://img.shields.io/github/v/release/hoangvya19/lg-tv-vibehack?style=flat-square)](https://github.com/hoangvya19/lg-tv-vibehack/releases)
+[![Release](https://img.shields.io/github/v/release/hoangvya19/lg-tv-webos-vibehack?style=flat-square)](https://github.com/hoangvya19/lg-tv-webos-vibehack/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![webOS](https://img.shields.io/badge/webOS-6%2B-a50034?style=flat-square)](#tv-đã-thử-nghiệm)
 
@@ -111,7 +111,7 @@ ssh root@192.168.1.50
 Dán lệnh này rồi Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh
 ```
 
 Hiện chữ **Done** thì gõ `reboot`. Xong. 🎉
@@ -120,7 +120,7 @@ Hiện chữ **Done** thì gõ `reboot`. Xong. 🎉
 <summary><b>Cài luôn hình nền, thời tiết và tiếng Việt trong 1 lệnh</b></summary>
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- \
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- \
   --city "Ho Chi Minh City" --wallpaper https://example.com/anh-cua-ban.jpg --lang vi --clock24 on
 ```
 
@@ -139,7 +139,7 @@ cùng mạng với TV. (Windows: dùng [WSL](https://learn.microsoft.com/windows
 1. **Bật Developer Mode.** Tạo tài khoản miễn phí tại [webostv.developer.lge.com](https://webostv.developer.lge.com).
    Trên TV, cài app **Developer Mode** từ LG Content Store, đăng nhập, bật **Dev Mode Status**
    (TV sẽ khởi động lại), mở lại app và bật **Key Server**.
-2. **Tải project:** [Tải ZIP](https://github.com/hoangvya19/lg-tv-vibehack/archive/refs/heads/main.zip) rồi giải nén.
+2. **Tải project:** [Tải ZIP](https://github.com/hoangvya19/lg-tv-webos-vibehack/archive/refs/heads/main.zip) rồi giải nén.
 3. **Chạy trình cài** trong cửa sổ lệnh, ở thư mục vừa giải nén:
    ```bash
    ./install-noroot.sh
@@ -186,7 +186,7 @@ từ 4 đến 10. Lựa chọn này lưu trên TV và được ưu tiên hơn `-
 **Dùng dòng lệnh:** chạy lại đúng lệnh cài, thêm tuỳ chọn mong muốn. Cài đặt cũ được giữ nguyên.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- --city "Da Nang"
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- --city "Da Nang"
 ```
 
 | Tuỳ chọn | Tác dụng |
@@ -297,14 +297,14 @@ Bình thường với TV ít RAM: app nặng đẩy launcher ra khỏi bộ nh�
 TV đã root: icon tự mất sau lần khởi động lại (hoặc chạy `sync.js`). Không root: chạy lại trình cài.
 </details>
 
-Vẫn chưa được? [Tạo issue](https://github.com/hoangvya19/lg-tv-vibehack/issues/new/choose)
+Vẫn chưa được? [Tạo issue](https://github.com/hoangvya19/lg-tv-webos-vibehack/issues/new/choose)
 kèm model TV, ảnh chụp màn hình và log.
 
 ## Gỡ cài đặt
 
 **TV đã root:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- --uninstall
 reboot
 ```
 

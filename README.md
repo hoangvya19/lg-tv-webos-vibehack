@@ -6,7 +6,7 @@
 
 *LG TV-vibehack · webOS-vibehack · LG-vibehack: a webOS launcher that replaces LG's ad-filled home.*
 
-[![Release](https://img.shields.io/github/v/release/hoangvya19/lg-tv-vibehack?style=flat-square)](https://github.com/hoangvya19/lg-tv-vibehack/releases)
+[![Release](https://img.shields.io/github/v/release/hoangvya19/lg-tv-webos-vibehack?style=flat-square)](https://github.com/hoangvya19/lg-tv-webos-vibehack/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![webOS](https://img.shields.io/badge/webOS-6%2B-a50034?style=flat-square)](#tested-tvs)
 [![Root](https://img.shields.io/badge/root-optional-555?style=flat-square)](#root-or-no-root)
@@ -113,7 +113,7 @@ ssh root@192.168.1.50
 Then paste this and press Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh
 ```
 
 When it says **Done**, type `reboot`. That's it. 🎉
@@ -122,7 +122,7 @@ When it says **Done**, type `reboot`. That's it. 🎉
 <summary><b>Same thing, with wallpaper, weather and Vietnamese in one go</b></summary>
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- \
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- \
   --city "Hanoi" --wallpaper https://example.com/my-photo.jpg --lang vi --clock24 on
 ```
 
@@ -141,7 +141,7 @@ on the same network as the TV. (Windows: use [WSL](https://learn.microsoft.com/w
 1. **Turn on Developer Mode.** Create a free account at [webostv.developer.lge.com](https://webostv.developer.lge.com).
    On the TV, install **Developer Mode** from the LG Content Store, sign in, turn on **Dev Mode Status**
    (the TV restarts), open it again and turn on **Key Server**.
-2. **Download this project:** [Download ZIP](https://github.com/hoangvya19/lg-tv-vibehack/archive/refs/heads/main.zip) and unzip it.
+2. **Download this project:** [Download ZIP](https://github.com/hoangvya19/lg-tv-webos-vibehack/archive/refs/heads/main.zip) and unzip it.
 3. **Run the installer** in a terminal inside the unzipped folder:
    ```bash
    ./install-noroot.sh
@@ -190,7 +190,7 @@ The QR code contains a private key, so other people on your Wi-Fi can't open the
 are kept between runs.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- --city "London"
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- --city "London"
 ```
 
 | Option | What it does |
@@ -301,14 +301,14 @@ Normal on TVs with less memory: big apps push the launcher out of memory, so it 
 Rooted: it disappears after the next reboot (or run `sync.js`). No root: run the installer again.
 </details>
 
-Still stuck? [Open an issue](https://github.com/hoangvya19/lg-tv-vibehack/issues/new/choose)
+Still stuck? [Open an issue](https://github.com/hoangvya19/lg-tv-webos-vibehack/issues/new/choose)
 with your TV model, a photo of the screen and the log.
 
 ## Uninstall
 
 **Rooted:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh -s -- --uninstall
 reboot
 ```
 

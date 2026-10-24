@@ -2,7 +2,7 @@
 # LG TV Vibehack - one-command installer for ROOTED LG webOS TVs.
 # Run it ON the TV as root (over SSH):
 #
-#   curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-vibehack/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/main/install.sh | sh
 #
 # Options (add after `sh -s --`), e.g.
 #   curl -fsSL .../install.sh | sh -s -- --lang vi --city "Hanoi" --wallpaper https://example.com/photo.jpg
@@ -21,7 +21,7 @@
 #   --uninstall             Remove everything this script installed
 set -e
 
-REPO="hoangvya19/lg-tv-vibehack"
+REPO="hoangvya19/lg-tv-webos-vibehack"
 BRANCH="main"
 RAW="https://raw.githubusercontent.com/$REPO/$BRANCH"
 IPK_URL="https://github.com/$REPO/releases/latest/download/lg-tv-vibehack.ipk"
