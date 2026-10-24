@@ -315,7 +315,6 @@ reboot
 | Model | webOS | Chế độ | Trạng thái |
 |---|---|---|---|
 | 55NANO77TPA | 6 (firmware 03.51.15) | Root | ✅ |
-| OLED55C6XLA | 26 | Không root | ✅ (từ project gốc) |
 
 Bạn đã thử trên TV khác? Tạo issue hoặc pull request để bổ sung vào bảng.
 
@@ -324,7 +323,6 @@ Bạn đã thử trên TV khác? Tạo issue hoặc pull request để bổ sung
 Project này được xây trên công sức của nhiều người. Xin cảm ơn:
 
 - **[Gathin23/tv-vibehack](https://github.com/Gathin23/tv-vibehack)**: launcher kiểu Apple TV gốc cho Android TV.
-- **[OmkarK97/webos-vibehack](https://github.com/OmkarK97/webos-vibehack)**: bản port sang webOS, nền tảng của project này.
 - **[webOS Homebrew Project](https://www.webosbrew.org)**: Homebrew Channel, công cụ root và kho app.
 - **[RootMyTV](https://rootmy.tv)**: giúp root được TV LG.
 - **[Simon34545/lginputhook](https://github.com/Simon34545/lginputhook)**: đổi chức năng nút remote.
