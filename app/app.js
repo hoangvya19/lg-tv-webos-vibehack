@@ -45,7 +45,7 @@
       },
       inputs: 'Inputs', settings: 'Settings', wired: 'Ethernet', offline: 'Offline', liveTv: 'Live TV',
       noInputs: 'No inputs found', cantOpen: "Can't open ", ampm: ['am', 'pm'],
-      moveHint: 'Arrows to move  ·  OK to place  ·  Back to cancel',
+      moveHint: 'Arrows or pointer to move  ·  OK to place  ·  Back to cancel',
       colsTitle: 'Tiles per row',
       wallTitle: 'Change wallpaper',
       wallScan: 'Scan this code with your phone camera, then pick a photo.',
@@ -57,7 +57,7 @@
       date: function (d) { return this.days[d.getDay()] + ', ' + d.getDate() + ' tháng ' + (d.getMonth() + 1); },
       inputs: 'Nguồn vào', settings: 'Cài đặt', wired: 'Wi-Fi', offline: 'Mất mạng', liveTv: 'Truyền hình',
       noInputs: 'Không tìm thấy nguồn vào', cantOpen: 'Không mở được ', ampm: ['SA', 'CH'],
-      moveHint: 'Mũi tên để di chuyển  ·  OK để đặt  ·  Back để huỷ',
+      moveHint: 'Mũi tên hoặc con trỏ để di chuyển  ·  OK để đặt  ·  Back để huỷ',
       colsTitle: 'Số ô mỗi hàng',
       wallTitle: 'Đổi hình nền',
       wallScan: 'Quét mã này bằng camera điện thoại rồi chọn ảnh.',
@@ -82,6 +82,7 @@
   var focused = 0, pillFocus = 0, inputFocus = 0, inputRows = [];
   var offset = 0, heroShown = false, glassShown = false;
   var editing = null;           // {item, snapshot} while a tile is being moved
+  var pressTimer = null, pressedLong = false;   // long press with the pointer
 
   // ---- luna bus ------------------------------------------------------------------------------
 
@@ -189,9 +190,25 @@
       name.textContent = app.title;
       el.appendChild(name);
       el.addEventListener('mouseover', function () {
-        if (zone !== 'inputs' && zone !== 'wall' && zone !== 'cols' && !editing) focusTile(items.indexOf(item));
+        if (editing) { if (item !== editing.item) moveTo(items.indexOf(item)); }   // pointer drags the tile
+        else if (zone !== 'inputs' && zone !== 'wall' && zone !== 'cols') focusTile(items.indexOf(item));
       });
+      // With the Magic Remote pointer, holding OK sends mousedown ... mouseup + click (no OK key),
+      // so a long press is timed here too, and the click that ends it is ignored.
+      el.addEventListener('mousedown', function () {
+        if (editing || zone === 'inputs' || zone === 'wall' || zone === 'cols') return;
+        clearTimeout(pressTimer);
+        pressTimer = setTimeout(function () {
+          pressTimer = null;
+          pressedLong = true;
+          focusTile(items.indexOf(item));
+          startEdit();
+        }, LONG_PRESS_MS);
+      });
+      el.addEventListener('mouseup', function () { clearTimeout(pressTimer); pressTimer = null; });
+      el.addEventListener('mouseleave', function () { clearTimeout(pressTimer); pressTimer = null; });
       el.addEventListener('click', function () {
+        if (pressedLong) { pressedLong = false; return; }
         if (editing) finishEdit(true);
         else launch(app.id, app.title);
       });
