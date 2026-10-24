@@ -1,0 +1,347 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TV wallpaper</title>
+<!-- Served by wallpaper-server.js on the TV. Runs on the phone, not on the TV. -->
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.4 system-ui, -apple-system, sans-serif; background: #0d0d0f; color: #eee; }
+  main { max-width: 560px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 22px; margin: 4px 0 16px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  [hidden] { display: none !important; }
+
+  /* 16:9 frame = the TV screen. In crop mode the photo moves behind it. */
+  .frame { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid #2a2a2e; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .frame img.photo { position: absolute; top: 0; left: 0; transform-origin: 0 0; max-width: none; pointer-events: none; }
+  #preview { background: #000 center / cover no-repeat; }
+  .shade { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; pointer-events: none; }
+  #empty { position: absolute; top: 50%; left: 0; right: 0; text-align: center; transform: translateY(-50%); color: #777; }
+
+  /* Guides: rule-of-thirds grid and where the launcher draws the clock, buttons and apps. */
+  .guides { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+  .guides .v, .guides .h { position: absolute; background: rgba(255, 255, 255, 0.45); }
+  .guides .v { top: 0; bottom: 0; width: 1px; }
+  .guides .h { left: 0; right: 0; height: 1px; }
+  .guides .box { position: absolute; border: 1px dashed rgba(255, 255, 255, 0.7); border-radius: 6px; background: rgba(0, 0, 0, 0.18);
+                 color: rgba(255, 255, 255, 0.85); font-size: 10px; padding: 2px 4px; }
+  .guides.off { display: none; }
+
+  .btn { display: block; width: 100%; padding: 15px; margin-top: 12px; border: 0; border-radius: 12px; font: 600 17px system-ui, sans-serif; color: #fff; background: #2f6bff; text-align: center; }
+  .btn.ghost { background: #24242a; }
+  .btn:disabled { opacity: 0.5; }
+  .pair { display: flex; gap: 10px; }
+  .pair .btn { flex: 1; }
+  label.row { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+  input[type=range] { flex: 1; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #aaa; font-size: 15px; }
+  .hint { color: #888; font-size: 14px; }
+  #status { min-height: 24px; margin-top: 14px; color: #9ad; }
+  #status.err { color: #f88; }
+  #usb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  #usb button { padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: #222; aspect-ratio: 16 / 9; }
+  #usb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #cityForm { display: flex; gap: 10px; margin-top: 10px; }
+  #cityForm input { flex: 1; min-width: 0; padding: 14px; border: 1px solid #333; border-radius: 12px; background: #18181c; color: #eee; font: 17px system-ui, sans-serif; }
+  #cityForm .btn { width: auto; margin: 0; padding: 14px 20px; }
+  #cities button { display: block; width: 100%; margin-top: 8px; padding: 12px 14px; border: 1px solid #2a2a2e; border-radius: 12px; background: #18181c; color: #eee; text-align: left; font: 16px system-ui, sans-serif; }
+  #cities small { color: #888; }
+  #weatherNow { color: #bbb; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="t-title"></h1>
+
+  <!-- Normal view: the current wallpaper -->
+  <section id="viewMode">
+    <div class="frame" id="preview"><div class="shade"></div><div id="empty"></div></div>
+    <label class="row"><span id="t-dim"></span><input id="dim" type="range" min="0" max="0.8" step="0.05"></label>
+    <button class="btn" id="pick"></button>
+    <input id="file" type="file" accept="image/*" hidden>
+    <button class="btn ghost" id="clear"></button>
+  </section>
+
+  <!-- Crop view: drag / pinch the photo inside the TV frame -->
+  <section id="cropMode" hidden>
+    <div class="frame" id="crop">
+      <img class="photo" id="photo" alt="">
+      <div class="shade"></div>
+      <div class="guides" id="guides">
+        <div class="v" style="left:33.333%"></div><div class="v" style="left:66.666%"></div>
+        <div class="h" style="top:33.333%"></div><div class="h" style="top:66.666%"></div>
+        <div class="box" id="g-clock" style="left:5.5%;top:4%;width:38%;height:18%"></div>
+        <div class="box" id="g-buttons" style="left:52.5%;top:14%;width:42.5%;height:8.5%"></div>
+        <div class="box" id="g-apps" style="left:5%;top:59%;width:89.5%;height:41%;border-bottom:0;border-radius:6px 6px 0 0"></div>
+      </div>
+    </div>
+    <p class="hint" id="t-cropHint"></p>
+    <label class="row"><span id="t-zoom"></span><input id="zoom" type="range" min="1" max="4" step="0.01" value="1"></label>
+    <label class="check"><input type="checkbox" id="showGuides" checked><span id="t-guides"></span></label>
+    <div class="pair">
+      <button class="btn ghost" id="cancel"></button>
+      <button class="btn" id="apply"></button>
+    </div>
+  </section>
+
+  <div id="status"></div>
+
+  <section id="weatherSection">
+    <h2 id="t-weather"></h2>
+    <div id="weatherNow"></div>
+    <form id="cityForm">
+      <input id="city" type="search" enterkeyhint="search" autocomplete="off">
+      <button class="btn" id="find" type="submit"></button>
+    </form>
+    <div id="cities"></div>
+    <button class="btn ghost" id="weatherOff"></button>
+  </section>
+
+  <section id="usbSection">
+    <h2 id="t-usb"></h2>
+    <div id="usb"></div>
+    <p class="hint" id="usbHint"></p>
+  </section>
+</main>
+<script>
+(function () {
+  var K = new URLSearchParams(location.search).get('k');
+  var T = {
+    en: { title: 'TV wallpaper', dim: 'Darken', pick: 'Choose a photo', clear: 'Remove wallpaper', usb: 'From a USB stick in the TV',
+      usbNone: 'No photos found. Plug a USB stick with photos into the TV, then reload this page.', empty: 'No wallpaper',
+      sending: 'Sending to the TV…', done: 'Done! The TV shows the new wallpaper.', fail: 'Something went wrong, try again.',
+      removed: 'Wallpaper removed.', confirm: 'Remove the wallpaper?', loading: 'Opening the photo…',
+      cropHint: 'The frame is the TV screen. Drag to move, pinch or use the slider to zoom.',
+      zoom: 'Zoom', guides: 'Show grid and where the clock and apps go', cancel: 'Cancel', apply: 'Set as wallpaper',
+      clock: 'Clock', buttons: 'Buttons', apps: 'Apps',
+      weather: 'Weather', weatherOn: 'Showing: ', weatherOffNow: 'Weather is off.', cityPh: 'City, e.g. Hanoi',
+      find: 'Search', weatherOff: 'Turn weather off', noCity: 'No city found. Try another spelling.',
+      cityDone: 'Done! The TV shows the weather for ', weatherOffDone: 'Weather turned off.', searching: 'Searching…' },
+    vi: { title: 'Hình nền TV', dim: 'Làm tối', pick: 'Chọn ảnh', clear: 'Xoá hình nền', usb: 'Ảnh từ USB cắm vào TV',
+      usbNone: 'Không thấy ảnh. Cắm USB có ảnh vào TV rồi tải lại trang này.', empty: 'Chưa có hình nền',
+      sending: 'Đang gửi lên TV…', done: 'Xong! TV đã đổi hình nền.', fail: 'Có lỗi, thử lại nhé.',
+      removed: 'Đã xoá hình nền.', confirm: 'Xoá hình nền?', loading: 'Đang mở ảnh…',
+      cropHint: 'Khung này là màn hình TV. Kéo để di chuyển, chụm 2 ngón hoặc kéo thanh để phóng to.',
+      zoom: 'Phóng to', guides: 'Hiện lưới và chỗ đồng hồ, ứng dụng', cancel: 'Huỷ', apply: 'Đặt làm hình nền',
+      clock: 'Đồng hồ', buttons: 'Nút', apps: 'Ứng dụng',
+      weather: 'Thời tiết', weatherOn: 'Đang hiện: ', weatherOffNow: 'Đang tắt thời tiết.', cityPh: 'Thành phố, vd: Đà Lạt',
+      find: 'Tìm', weatherOff: 'Tắt thời tiết', noCity: 'Không tìm thấy, thử gõ cách khác.',
+      cityDone: 'Xong! TV hiện thời tiết ', weatherOffDone: 'Đã tắt thời tiết.', searching: 'Đang tìm…' }
+  };
+  var L = T.en;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function api(method, p, body) {
+    return fetch(p + (p.indexOf('?') < 0 ? '?' : '&') + 'k=' + K, { method: method, body: body })
+      .then(function (r) { if (!r.ok) throw r; return r.json(); });
+  }
+  function status(t, err) { var s = $('status'); s.textContent = t || ''; s.className = err ? 'err' : ''; }
+  function busy(b) { ['pick', 'clear', 'apply', 'cancel'].forEach(function (i) { $(i).disabled = b; }); }
+  function refresh(has) {
+    $('preview').style.backgroundImage = has ? 'url(current.jpg?k=' + K + '&t=' + Date.now() + ')' : 'none';
+    $('empty').textContent = has ? '' : L.empty;
+  }
+  function shade() {
+    var v = $('dim').value;
+    Array.prototype.forEach.call(document.querySelectorAll('.shade'), function (s) { s.style.opacity = v; });
+  }
+
+  // ---- crop: the photo is scaled by `s` and moved by (x, y) behind the frame -------------------
+  var img = $('photo'), frame = $('crop');
+  var st = { s: 1, min: 1, x: 0, y: 0, src: '' };
+
+  function fw() { return frame.clientWidth; }
+  function fh() { return frame.clientHeight; }
+  function clamp() {
+    var w = img.naturalWidth * st.s, h = img.naturalHeight * st.s;
+    st.x = Math.min(0, Math.max(fw() - w, st.x));
+    st.y = Math.min(0, Math.max(fh() - h, st.y));
+  }
+  function draw() {
+    clamp();
+    img.style.transform = 'translate(' + st.x + 'px,' + st.y + 'px) scale(' + st.s + ')';
+    $('zoom').value = st.s / st.min;
+  }
+  /** Zoom to `s`, keeping the frame point (cx, cy) still. */
+  function zoomTo(s, cx, cy) {
+    s = Math.max(st.min, Math.min(st.min * 4, s));
+    st.x = cx - (cx - st.x) * s / st.s;
+    st.y = cy - (cy - st.y) * s / st.s;
+    st.s = s;
+    draw();
+  }
+
+  function openCrop(src) {
+    status(L.loading);
+    img.onload = function () {
+      status('');
+      $('viewMode').hidden = true;
+      $('usbSection').hidden = true;
+      $('cropMode').hidden = false;
+      $('weatherSection').hidden = true;
+      st.src = src;
+      st.min = Math.max(fw() / img.naturalWidth, fh() / img.naturalHeight);   // cover the frame
+      st.s = st.min;
+      st.x = (fw() - img.naturalWidth * st.s) / 2;
+      st.y = (fh() - img.naturalHeight * st.s) / 2;
+      draw();
+      frame.scrollIntoView({ block: 'center' });
+    };
+    img.onerror = function () { status(L.fail, 1); };
+    img.src = src;
+  }
+  function closeCrop() {
+    $('cropMode').hidden = true;
+    $('viewMode').hidden = false;
+    $('usbSection').hidden = false;
+    $('weatherSection').hidden = false;
+  }
+
+  // One finger drags, two fingers pinch. Pointer events work for touch and mouse alike.
+  var pts = {}, last = null;
+  function pinchInfo() {
+    var p = Object.keys(pts).map(function (k) { return pts[k]; });
+    if (p.length === 1) return { x: p[0].x, y: p[0].y, d: 0 };
+    return { x: (p[0].x + p[1].x) / 2, y: (p[0].y + p[1].y) / 2, d: Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) };
+  }
+  function local(e) { var r = frame.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  frame.addEventListener('pointerdown', function (e) {
+    frame.setPointerCapture(e.pointerId);
+    pts[e.pointerId] = local(e);
+    last = pinchInfo();
+  });
+  frame.addEventListener('pointermove', function (e) {
+    if (!pts[e.pointerId]) return;
+    pts[e.pointerId] = local(e);
+    var now = pinchInfo();
+    if (last && now.d && last.d) zoomTo(st.s * now.d / last.d, now.x, now.y);
+    st.x += now.x - last.x;
+    st.y += now.y - last.y;
+    draw();
+    last = now;
+  });
+  function lift(e) { delete pts[e.pointerId]; last = Object.keys(pts).length ? pinchInfo() : null; }
+  frame.addEventListener('pointerup', lift);
+  frame.addEventListener('pointercancel', lift);
+  frame.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var p = local(e);
+    zoomTo(st.s * (e.deltaY < 0 ? 1.08 : 1 / 1.08), p.x, p.y);
+  }, { passive: false });
+  $('zoom').oninput = function () { zoomTo(st.min * parseFloat(this.value), fw() / 2, fh() / 2); };
+  $('showGuides').onchange = function () { $('guides').className = 'guides' + (this.checked ? '' : ' off'); };
+
+  /** The part of the photo inside the frame, as a 1920x1080 JPEG. */
+  function cropped() {
+    return new Promise(function (ok, no) {
+      var c = document.createElement('canvas');
+      c.width = 1920; c.height = 1080;
+      var sx = -st.x / st.s, sy = -st.y / st.s, sw = fw() / st.s, sh = fh() / st.s;
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, 1920, 1080);
+      c.toBlob(function (b) { if (b) ok(b); else no(); }, 'image/jpeg', 0.88);
+    });
+  }
+
+  $('apply').onclick = function () {
+    busy(true);
+    status(L.sending);
+    cropped().then(function (b) { return api('POST', 'api/upload', b); })
+      .then(function () { closeCrop(); refresh(true); status(L.done); })
+      .catch(function () { status(L.fail, 1); })
+      .then(function () { busy(false); });
+  };
+  $('cancel').onclick = function () { closeCrop(); status(''); };
+
+  // ---- weather city ----------------------------------------------------------------------------
+  function showWeather(w) {
+    $('weatherNow').textContent = w.enabled ? L.weatherOn + w.place : L.weatherOffNow;
+    $('weatherOff').hidden = !w.enabled;
+  }
+  $('cityForm').onsubmit = function (e) {
+    e.preventDefault();
+    var q = $('city').value.trim();
+    if (!q) return;
+    $('city').blur();
+    $('cities').innerHTML = '';
+    status(L.searching);
+    api('GET', 'api/city?q=' + encodeURIComponent(q)).then(function (r) {
+      if (!r.results.length) { status(L.noCity, 1); return; }
+      status('');
+      r.results.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = c.name + ' ';
+        var sm = document.createElement('small');
+        sm.textContent = [c.region, c.country].filter(Boolean).join(', ');
+        b.appendChild(sm);
+        b.onclick = function () {
+          status(L.sending);
+          api('POST', 'api/weather?lat=' + c.latitude + '&lon=' + c.longitude + '&place=' + encodeURIComponent(c.name))
+            .then(function () {
+              $('cities').innerHTML = '';
+              $('city').value = '';
+              showWeather({ enabled: true, place: c.name });
+              status(L.cityDone + c.name + '.');
+            }).catch(function () { status(L.fail, 1); });
+        };
+        $('cities').appendChild(b);
+      });
+    }).catch(function () { status(L.fail, 1); });
+  };
+  $('weatherOff').onclick = function () {
+    api('POST', 'api/weather?off=1').then(function () { showWeather({ enabled: false }); status(L.weatherOffDone); })
+      .catch(function () { status(L.fail, 1); });
+  };
+
+  // ---- normal view -----------------------------------------------------------------------------
+  $('pick').onclick = function () { $('file').click(); };
+  $('file').onchange = function () {
+    var f = this.files[0];
+    if (f) openCrop(URL.createObjectURL(f));
+    this.value = '';
+  };
+  $('clear').onclick = function () {
+    if (!confirm(L.confirm)) return;
+    busy(true);
+    api('POST', 'api/clear').then(function () { refresh(false); status(L.removed); })
+      .catch(function () { status(L.fail, 1); })
+      .then(function () { busy(false); });
+  };
+  $('dim').oninput = shade;
+  $('dim').onchange = function () {
+    api('POST', 'api/dim?v=' + this.value).then(function () { status(L.done); }).catch(function () { status(L.fail, 1); });
+  };
+
+  api('GET', 'api/state').then(function (s) {
+    L = T[s.language] || T.en;
+    document.documentElement.lang = s.language;
+    ['title', 'dim', 'usb', 'cropHint', 'zoom', 'guides', 'weather'].forEach(function (k) { $('t-' + k).textContent = L[k]; });
+    ['pick', 'clear', 'cancel', 'apply', 'find', 'weatherOff'].forEach(function (k) { $(k).textContent = L[k]; });
+    $('city').placeholder = L.cityPh;
+    showWeather(s.weather || {});
+    ['clock', 'buttons', 'apps'].forEach(function (k) { $('g-' + k).textContent = L[k]; });
+    $('dim').value = s.dim;
+    shade();
+    refresh(s.hasWallpaper);
+    return api('GET', 'api/usb');
+  }).then(function (r) {
+    if (!r.images.length) { $('usbHint').textContent = L.usbNone; return; }
+    r.images.forEach(function (p) {
+      var src = 'api/usb/img?p=' + encodeURIComponent(p) + '&k=' + K;
+      var b = document.createElement('button');
+      b.title = p;
+      var im = document.createElement('img');
+      im.loading = 'lazy';
+      im.src = src;
+      b.appendChild(im);
+      b.onclick = function () { openCrop(src); };
+      $('usb').appendChild(b);
+    });
+  }).catch(function () { status(L.fail, 1); });
+})();
+</script>
+</body>
+</html>

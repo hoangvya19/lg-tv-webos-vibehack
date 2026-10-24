@@ -1,0 +1,19 @@
+{
+  "id": "com.gathin.tvhome",
+  "version": "1.1.0",
+  "vendor": "LG TV Vibehack",
+  "type": "web",
+  "main": "index.html",
+  "title": "Home",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "bgColor": "#000000",
+  "iconColor": "#000000",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true,
+  "requiredACG": [
+    "application.launcher",
+    "network.query"
+  ],
+  "noSplashOnLaunch": true
+}

@@ -1,0 +1,404 @@
+/* Sizes are the Android launcher's dp values doubled: webOS renders web apps at 1920x1080. */
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/outfit.ttf') format('truetype');
+  font-weight: 100 900;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  cursor: default;
+}
+
+/* ---- ambient glow ---------------------------------------------------------------------------- */
+
+.ambient {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  pointer-events: none;
+}
+
+/* ---- top shelf ------------------------------------------------------------------------------- */
+
+#hero {
+  position: absolute;
+  left: 136px;
+  font-size: 96px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 260ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+
+/* ---- header ---------------------------------------------------------------------------------- */
+
+header {
+  position: absolute;
+  top: 52px;
+  left: 112px;
+  right: 112px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 3;
+  transition: opacity 300ms ease, transform 360ms cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+
+/* Below the dock: the header slides away so the grid gets the whole screen. */
+body.scrolled header {
+  opacity: 0;
+  transform: translateY(-48px);
+  pointer-events: none;
+}
+
+#greeting {
+  margin-left: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+#timeRow { display: flex; align-items: flex-end; }
+
+#clock {
+  font-size: 104px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+#ampm {
+  margin: 0 0 16px 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.divider {
+  width: 2px;
+  height: 52px;
+  margin: 0 32px 16px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#date {
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: pre;
+}
+
+#topButtons { display: flex; margin-bottom: 12px; }
+
+/* Frosted pill, tvOS style. */
+.pill {
+  display: flex;
+  align-items: center;
+  height: 84px;
+  margin-left: 20px;
+  padding: 0 40px 0 32px;
+  border-radius: 42px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  color: #fff;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: background 160ms ease, color 160ms ease, transform 200ms ease;
+}
+
+.pill svg { width: 44px; height: 44px; margin-right: 18px; fill: currentColor; }
+
+.pill.focused {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: transparent;
+  color: #000;
+  transform: scale(1.04);
+}
+
+/* ---- grid ------------------------------------------------------------------------------------ */
+
+#viewport {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  overflow: hidden;
+}
+
+#stage {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transition: transform 420ms cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+
+/* The tvOS lighter band behind the dock row. */
+#dockBand {
+  position: absolute;
+  border-radius: 52px;
+  background: #141416;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.item {
+  position: absolute;
+  width: var(--tile-w, 360px);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 400ms ease, transform 400ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    left 320ms cubic-bezier(0.25, 0.8, 0.3, 1), top 320ms cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+
+.item.shown { opacity: 1; transform: none; }
+
+.item.dock .name { display: none; }
+
+/* Rearranging: the held tile wiggles and floats above the others; the glass steps aside. */
+.item.moving { z-index: 2; }
+
+.item.moving .card {
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  animation: wiggle 240ms ease-in-out infinite alternate;
+}
+
+@keyframes wiggle {
+  from { transform: scale(1.1) rotate(-1.2deg); }
+  to { transform: scale(1.1) rotate(1.2deg); }
+}
+
+body.editing #glass { opacity: 0 !important; }
+
+.card {
+  position: relative;
+  width: var(--tile-w, 360px);
+  height: var(--tile-h, 202px);
+  border-radius: var(--tile-r, 32px);
+  overflow: hidden;
+  background: #1c1c1e;
+  transition: transform 180ms ease;
+}
+
+/* Faint rim so black tiles (Apple TV) still read against the black page. */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  border-radius: var(--tile-r, 32px);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.item.focused .card {
+  transform: scale(1.1);
+  transition: transform 260ms cubic-bezier(0.34, 1.6, 0.5, 1);
+}
+
+.card img {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+/* Transparent system icons: smaller glyph, centred. */
+.card.glyph img {
+  top: 50%;
+  height: 62%;
+  transform: translate(-50%, -50%);
+}
+
+.name {
+  height: 44px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.item.focused .name { opacity: 1; transform: translateY(8px); }
+
+/* The single floating glass highlight that springs between tiles. */
+#glass {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: var(--glass-r, 47px);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.07));
+  box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.19), 0 0 12px 4px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 520ms cubic-bezier(0.3, 1.35, 0.45, 1);
+}
+
+/* Bright top specular. */
+#glass::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+}
+
+/* ---- inputs dropdown ------------------------------------------------------------------------- */
+
+#inputsPanel {
+  position: absolute;
+  z-index: 5;
+  padding: 16px;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(42, 42, 46, 0.95), rgba(22, 22, 24, 0.96));
+  transform-origin: top;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+#inputsPanel.hidden { opacity: 0; transform: translateY(-16px) scaleY(0.92); pointer-events: none; }
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  height: 84px;
+  padding: 0 24px;
+  border-radius: 24px;
+  font-size: 30px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.inputRow svg { width: 40px; height: 40px; margin-right: 20px; fill: currentColor; }
+
+.inputRow.focused { background: rgba(255, 255, 255, 0.96); color: #000; }
+
+.separator { height: 2px; margin: 12px 24px; background: rgba(255, 255, 255, 0.12); }
+
+/* ---- toast ----------------------------------------------------------------------------------- */
+
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: 80px;
+  padding: 20px 40px;
+  border-radius: 40px;
+  background: rgba(40, 40, 44, 0.95);
+  font-size: 28px;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 200ms ease;
+  z-index: 6;
+}
+
+#toast.shown { opacity: 1; }
+
+/* ---- LG TV Vibehack additions ---- */
+#weather {
+  margin: 16px 0 0 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: pre;
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+#weather.shown { opacity: 1; }
+body.no-glow .ambient { display: none; }
+
+/* Wallpaper button (icon only, so the top row still fits next to the weather) and its QR panel. */
+.pill.iconOnly { padding: 0 20px; }
+.pill.iconOnly svg { margin-right: 0; }
+
+#wallPanel {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  padding: 32px;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(42, 42, 46, 0.96), rgba(22, 22, 24, 0.97));
+  transform-origin: top;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+#wallPanel.hidden { opacity: 0; transform: translateY(-16px) scaleY(0.92); pointer-events: none; }
+#wallQr { width: 300px; height: 300px; padding: 16px; border-radius: 24px; background: #fff; }
+#wallQr img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+#wallText { margin-left: 36px; max-width: 520px; }
+#wallTitle { font-size: 38px; font-weight: 600; }
+#wallScan { margin-top: 14px; color: rgba(255, 255, 255, 0.75); font-size: 28px; line-height: 1.35; }
+#wallUrl { margin-top: 22px; color: rgba(255, 255, 255, 0.5); font-size: 22px; word-break: break-all; }
+
+/* Pencil next to the dock and the tiles-per-row picker. */
+#penBtn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 36px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  color: #fff;
+  transition: background 160ms ease, color 160ms ease, transform 200ms ease;
+}
+#penBtn svg { width: 36px; height: 36px; fill: currentColor; }
+#penBtn.focused { background: rgba(255, 255, 255, 0.96); border-color: transparent; color: #000; transform: scale(1.12); }
+body.editing #penBtn { opacity: 0.3; }
+
+#colsPanel {
+  position: absolute;
+  z-index: 5;
+  padding: 24px 28px 28px;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(42, 42, 46, 0.96), rgba(22, 22, 24, 0.97));
+  transform-origin: bottom;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+#colsPanel.hidden { opacity: 0; transform: translateY(16px) scaleY(0.92); pointer-events: none; }
+.colsTitle { margin: 0 0 18px 8px; color: rgba(255, 255, 255, 0.75); font-size: 28px; font-weight: 500; }
+.colsRow { display: flex; }
+.colCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  margin: 0 6px;
+  border-radius: 24px;
+  font-size: 36px;
+  font-weight: 600;
+}
+.colCell.current { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); }
+.colCell.focused { background: rgba(255, 255, 255, 0.96); color: #000; }

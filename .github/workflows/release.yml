@@ -1,0 +1,34 @@
+# Builds the launcher package and attaches it to a GitHub Release.
+# Create a release by pushing a tag:  git tag v1.1.0 && git push origin v1.1.0
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Package the launcher
+        run: |
+          mkdir -p build
+          npx -y -p @webos-tools/cli ares-package app -o build
+          cp build/com.gathin.tvhome_*.ipk build/lg-tv-vibehack.ipk
+          ls -la build
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/lg-tv-vibehack.ipk
+          generate_release_notes: true
