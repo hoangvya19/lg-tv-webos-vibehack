@@ -1,8 +1,10 @@
 /* Sizes are the Android launcher's dp values doubled: webOS renders web apps at 1920x1080. */
 
+/* Lexend: one variable file for every weight, and it covers Vietnamese. Outfit was missing 42 of
+   the 53 Vietnamese letters, so TVs substituted their own font mid-word. */
 @font-face {
-  font-family: 'Outfit';
-  src: url('fonts/outfit.ttf') format('truetype');
+  font-family: 'Lexend';
+  src: url('fonts/lexend.ttf') format('truetype');
   font-weight: 100 900;
 }
 
@@ -14,7 +16,7 @@ html, body {
   overflow: hidden;
   background: #000;
   color: #fff;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Lexend', sans-serif;
   cursor: default;
 }
 

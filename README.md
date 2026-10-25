@@ -367,7 +367,7 @@ This project stands on the work of others. Thank you:
 - **[RootMyTV](https://rootmy.tv)**: making root possible on LG TVs.
 - **[Simon34545/lginputhook](https://github.com/Simon34545/lginputhook)**: remote button remapping.
 - **[Open-Meteo](https://open-meteo.com)**: free weather and geocoding API.
-- **[Outfit](https://fonts.google.com/specimen/Outfit)** font (SIL Open Font License).
+- **[Lexend](https://fonts.google.com/specimen/Lexend)** font (SIL Open Font License), which covers Vietnamese.
 - Built with help from **[Claude](https://claude.ai)** by Anthropic.
 
 ## Support

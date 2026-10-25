@@ -339,7 +339,7 @@ Project này được xây trên công sức của nhiều người. Xin cảm �
 - **[RootMyTV](https://rootmy.tv)**: giúp root được TV LG.
 - **[Simon34545/lginputhook](https://github.com/Simon34545/lginputhook)**: đổi chức năng nút remote.
 - **[Open-Meteo](https://open-meteo.com)**: API thời tiết và tìm toạ độ miễn phí.
-- Font **[Outfit](https://fonts.google.com/specimen/Outfit)** (SIL Open Font License).
+- Font **[Lexend](https://fonts.google.com/specimen/Lexend)** (SIL Open Font License), có đủ chữ tiếng Việt.
 - Thực hiện cùng **[Claude](https://claude.ai)** của Anthropic.
 
 ## Ủng hộ
