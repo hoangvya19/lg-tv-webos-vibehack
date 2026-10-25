@@ -852,8 +852,39 @@
     pen.classList.remove('focused');
     pills.forEach(function (p) { p.classList.remove('focused'); });
     zone = 'none';
-    animateIn();
-    focusTile(focused);
+    refreshApps(function (changed) {
+      if (!changed) { animateIn(); focusTile(focused); }
+    });
+  }
+
+  /**
+   * Re-reads apps.js, which sync.js rewrites whenever an app is installed or removed. A page on
+   * webOS 6 cannot fetch a local file with XHR, so the script is simply added again.
+   */
+  function appsFingerprint() {
+    var all = (window.TV_APPS && TV_APPS.apps) || [];
+    return all.map(function (a) { return a.id; }).sort().join(',');
+  }
+  var appsSeen = appsFingerprint();
+
+  function refreshApps(cb) {
+    var old = $('appsJs');
+    if (old) old.parentNode.removeChild(old);
+    var sc = document.createElement('script');
+    sc.id = 'appsJs';
+    sc.src = 'apps.js?t=' + Date.now();
+    sc.onload = function () {
+      var now = appsFingerprint();
+      if (now === appsSeen) { cb(false); return; }   // nothing installed or removed
+      appsSeen = now;
+      build();
+      focused = Math.max(0, Math.min(focused, items.length - 1));
+      animateIn();
+      focusTile(focused);
+      cb(true);
+    };
+    sc.onerror = function () { cb(false); };
+    document.body.appendChild(sc);
   }
 
   // The wallpaper page relaunches us with {reload: true} after changing the wallpaper.

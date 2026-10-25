@@ -67,5 +67,44 @@ function start() {
   p.on('exit', function () { clearTimeout(retry); setTimeout(start, readyAt ? 2000 : 1000); });
 }
 
+// ---- app list ---------------------------------------------------------------------------------
+// webOS reports every install and removal on this subscription, so the launcher no longer has to
+// wait for the next boot to notice a new app. Each change re-runs sync.js, which rewrites apps.js;
+// the launcher picks that up when it is opened again.
+var SYNC = '/home/root/lg-tv-vibehack/sync.js';
+var lastIds = null, syncing = false, syncAgain = false;
+
+function runSync() {
+  if (syncing) { syncAgain = true; return; }
+  syncing = true;
+  execFile('/usr/bin/node', [SYNC], { timeout: 180000 }, function (err, out, errOut) {
+    syncing = false;
+    log('app list changed, synced' + (err ? ' with errors: ' + String(errOut).trim() : ': ' + String(out).trim()));
+    if (syncAgain) { syncAgain = false; runSync(); }
+  });
+}
+
+function watchApps() {
+  var p = spawn('luna-send', ['-i', 'luna://com.webos.applicationManager/listLaunchPoints', '{"subscribe":true}']);
+  var buf = '';
+  p.stdout.on('data', function (d) {
+    buf += d;
+    var lines = buf.split('\n');
+    buf = lines.pop();
+    lines.forEach(function (l) {
+      var j;
+      try { j = JSON.parse(l); } catch (e) { return; }
+      if (!j.launchPoints || !j.launchPoints.length) return;
+      var ids = j.launchPoints.map(function (x) { return x.id; }).sort().join(',');
+      if (lastIds === null) { lastIds = ids; return; }   // first reply is the current list
+      if (ids === lastIds) return;
+      lastIds = ids;
+      runSync();
+    });
+  });
+  p.on('exit', function () { setTimeout(watchApps, 5000); });
+}
+
 log('homewatch started');
 start();
+watchApps();
