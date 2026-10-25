@@ -899,6 +899,9 @@
   build();
   updateClock();
   setInterval(updateClock, 10000);
+  // Some firmware never fires webOSRelaunch or visibilitychange for this app, so returning to the
+  // launcher is not a reliable moment to look for new apps. Checking apps.js on a timer is.
+  setInterval(function () { refreshApps(function () { }); }, 20000);
   document.documentElement.lang = CONFIG.language === 'vi' ? 'vi' : 'en';
   pills[0].querySelector('span').textContent = L.inputs;
   pills[3].querySelector('span').textContent = L.settings;
