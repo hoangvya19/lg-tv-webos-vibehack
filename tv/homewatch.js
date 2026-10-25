@@ -72,7 +72,7 @@ function start() {
 // wait for the next boot to notice a new app. Each change re-runs sync.js, which rewrites apps.js;
 // the launcher picks that up when it is opened again.
 var SYNC = '/home/root/lg-tv-vibehack/sync.js';
-var lastIds = null, syncing = false, syncAgain = false;
+var syncing = false, syncAgain = false;
 
 function runSync() {
   if (syncing) { syncAgain = true; return; }
@@ -94,11 +94,11 @@ function watchApps() {
     lines.forEach(function (l) {
       var j;
       try { j = JSON.parse(l); } catch (e) { return; }
-      if (!j.launchPoints || !j.launchPoints.length) return;
-      var ids = j.launchPoints.map(function (x) { return x.id; }).sort().join(',');
-      if (lastIds === null) { lastIds = ids; return; }   // first reply is the current list
-      if (ids === lastIds) return;
-      lastIds = ids;
+      // The first reply carries the whole list; after that webOS sends one launch point per
+      // change, tagged "added", "removed" or "updated".
+      if (j.launchPoints) return;
+      if (j.change !== 'added' && j.change !== 'removed') return;
+      log('app ' + j.change + ': ' + j.id);
       runSync();
     });
   });
