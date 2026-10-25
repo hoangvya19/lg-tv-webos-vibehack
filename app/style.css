@@ -452,3 +452,18 @@ body.arranging .item:nth-child(even):not(.moving):not(.focused) .card { animatio
   from { transform: rotate(-1deg); }
   to { transform: rotate(1deg); }
 }
+
+/* Shown when apps.js has no apps, so the screen is never just black. */
+#noApps {
+  position: absolute;
+  top: 300px;
+  left: 112px;
+  right: 112px;
+  padding: 40px 48px;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(30, 30, 34, 0.94);
+  font-size: 34px;
+  line-height: 1.45;
+  opacity: 1;
+}

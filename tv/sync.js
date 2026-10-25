@@ -30,8 +30,61 @@ function safeName(id) { return id.replace(/[^A-Za-z0-9._-]/g, '_') + '.png'; }
 
 function isFile(p) { try { return !!p && fs.statSync(p).isFile(); } catch (e) { return false; } }
 
+// Where webOS keeps installed apps. Read when listLaunchPoints gives nothing (seen on webOS 4.4).
+var APP_DIRS = [
+  '/usr/palm/applications',
+  '/media/cryptofs/apps/usr/palm/applications',
+  '/media/developer/apps/usr/palm/applications',
+  '/mnt/otycabi/usr/palm/applications',
+  '/mnt/otncabi/usr/palm/applications'
+];
+
+function fromLuna() {
+  var res;
+  try {
+    res = luna('luna://com.webos.applicationManager/listLaunchPoints');
+  } catch (e) {
+    console.error('listLaunchPoints failed: ' + e.message);
+    return [];
+  }
+  if (res && res.launchPoints && res.launchPoints.length) return res.launchPoints;
+  console.error('listLaunchPoints returned no apps: ' + JSON.stringify(res).slice(0, 300));
+  return [];
+}
+
+/** Builds launch points by reading every appinfo.json on disk. */
+function fromDisk() {
+  var seen = {}, out = [];
+  APP_DIRS.forEach(function (dir) {
+    var names;
+    try { names = fs.readdirSync(dir); } catch (e) { return; }
+    names.forEach(function (n) {
+      var base = path.join(dir, n);
+      var info = readJSON(path.join(base, 'appinfo.json'), null);
+      if (!info || !info.id || seen[info.id] || info.visible === false) return;
+      seen[info.id] = true;
+      out.push({
+        id: info.id,
+        title: info.title || info.id,
+        icon: info.icon ? path.join(base, info.icon) : '',
+        largeIcon: info.largeIcon ? path.join(base, info.largeIcon) : '',
+        iconColor: info.iconColor || info.bgColor || ''
+      });
+    });
+  });
+  return out;
+}
+
+/** webOS first; on firmware where that stays empty, the app folders on disk. */
+function listPoints() {
+  var points = fromLuna();
+  if (points.length) return { points: points, source: 'webOS' };
+  console.error('Falling back to reading the app folders on disk.');
+  return { points: fromDisk(), source: 'disk' };
+}
+
 function main() {
-  var points = (luna('luna://com.webos.applicationManager/listLaunchPoints').launchPoints) || [];
+  var found = listPoints(), points = found.points;
 
   if (process.argv.indexOf('--list') !== -1) {
     points.forEach(function (p) { console.log((p.id + '                                             ').slice(0, 45) + ' ' + p.title); });
@@ -66,6 +119,14 @@ function main() {
     try { fs.copyFileSync(src, path.join(iconDir, name)); } catch (e) { return; }
     apps.push({ id: p.id, title: p.title, icon: 'icons/' + name, iconColor: p.iconColor || p.bgColor || '' });
   });
+  // An empty list would leave an empty launcher on screen, so keep whatever is already there.
+  if (!apps.length) {
+    console.error('No apps found. Tried listLaunchPoints and ' + APP_DIRS.join(', ') + '.');
+    console.error('The app list was left unchanged. Please report this with your TV model and');
+    console.error('webOS version: https://github.com/hoangvya19/lg-tv-webos-vibehack/issues');
+    process.exit(1);
+  }
+
   fs.writeFileSync(path.join(APP_DIR, 'apps.js'),
     '// Generated on the TV by sync.js\nwindow.TV_APPS = ' + JSON.stringify({ apps: apps, inputs: inputs }, null, 1) + ';\n');
 
@@ -83,7 +144,7 @@ function main() {
     '// Generated on the TV by sync.js from ' + DATA + '/settings.json\n' +
     '(function () { var u = ' + JSON.stringify(settings) + '; for (var k in u) window.CONFIG[k] = u[k]; })();\n');
 
-  console.log('Synced ' + apps.length + ' apps and ' + inputs.length + ' inputs.');
+  console.log('Synced ' + apps.length + ' apps (from ' + found.source + ') and ' + inputs.length + ' inputs.');
 }
 
 main();

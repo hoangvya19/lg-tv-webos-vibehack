@@ -46,6 +46,8 @@
       inputs: 'Inputs', settings: 'Settings', wired: 'Ethernet', offline: 'Offline', liveTv: 'Live TV',
       noInputs: 'No inputs found', cantOpen: "Can't open ", ampm: ['am', 'pm'],
       moveHint: 'Arrows or pointer to move  ·  OK to place  ·  Back to cancel',
+      noApps: 'No apps were found on this TV. Run the installer again over SSH; if it keeps happening, ' +
+        'please report your TV model and webOS version at github.com/hoangvya19/lg-tv-webos-vibehack/issues',
       colsTitle: 'Tiles per row', arrange: 'Rearrange apps', done: 'Done',
       arrangeHint: 'Click an app to pick it up, point where it should go, click again to drop it.',
       wallTitle: 'Change wallpaper',
@@ -59,6 +61,8 @@
       inputs: 'Nguồn vào', settings: 'Cài đặt', wired: 'Wi-Fi', offline: 'Mất mạng', liveTv: 'Truyền hình',
       noInputs: 'Không tìm thấy nguồn vào', cantOpen: 'Không mở được ', ampm: ['SA', 'CH'],
       moveHint: 'Mũi tên hoặc con trỏ để di chuyển  ·  OK để đặt  ·  Back để huỷ',
+      noApps: 'Không tìm thấy ứng dụng nào trên TV này. Chạy lại lệnh cài qua SSH; nếu vẫn vậy, ' +
+        'báo giúp model TV và phiên bản webOS tại github.com/hoangvya19/lg-tv-webos-vibehack/issues',
       colsTitle: 'Số ô mỗi hàng', arrange: 'Sắp xếp ứng dụng', done: 'Xong',
       arrangeHint: 'Bấm vào app để nhấc lên, trỏ tới chỗ mới rồi bấm lần nữa để đặt.',
       wallTitle: 'Đổi hình nền',
@@ -220,6 +224,13 @@
       tilesEl.appendChild(el);
       return item;
     });
+    // apps.js could not be filled in: say so instead of showing an empty screen.
+    if (!items.length) {
+      var msg = document.createElement('div');
+      msg.id = 'noApps';
+      msg.textContent = L.noApps;
+      tilesEl.appendChild(msg);
+    }
     layout();
   }
 
