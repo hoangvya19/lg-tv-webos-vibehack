@@ -31,6 +31,10 @@ function safeName(id) { return id.replace(/[^A-Za-z0-9._-]/g, '_') + '.png'; }
 
 function isFile(p) { try { return !!p && fs.statSync(p).isFile(); } catch (e) { return false; } }
 
+// fs.copyFileSync only exists from Node 8.5. webOS 4 TVs run Node 0.12, where calling it threw and
+// every app was skipped, so the launcher ended up empty. Keep every TV script ES5 and Node 0.12 safe.
+function copyFile(src, dest) { fs.writeFileSync(dest, fs.readFileSync(src)); }
+
 // Where webOS keeps installed apps. Read when listLaunchPoints gives nothing (seen on webOS 4.4).
 var APP_DIRS = [
   '/usr/palm/applications',
@@ -128,12 +132,13 @@ function main() {
     var custom = path.join(DATA, 'icons', name);
     var src = isFile(custom) ? custom : (isFile(p.largeIcon) ? p.largeIcon : p.icon);
     if (!isFile(src)) return;
-    try { fs.copyFileSync(src, path.join(iconDir, name)); } catch (e) { return; }
+    try { copyFile(src, path.join(iconDir, name)); } catch (e) { return; }
     apps.push({ id: p.id, title: p.title, icon: 'icons/' + name, iconColor: p.iconColor || p.bgColor || '' });
   });
   // An empty list would leave an empty launcher on screen, so keep whatever is already there.
   if (!apps.length) {
-    console.error('No apps found. Tried listLaunchPoints and ' + APP_DIRS.join(', ') + '.');
+    console.error('No apps found (node ' + process.version + ', ' + points.length + ' launch points).');
+    console.error('Tried listLaunchPoints and ' + APP_DIRS.join(', ') + '.');
     console.error('The app list was left unchanged. Please report this with your TV model and');
     console.error('webOS version: https://github.com/hoangvya19/lg-tv-webos-vibehack/issues');
     process.exit(1);
@@ -150,7 +155,7 @@ function main() {
   fs.readdirSync(APP_DIR).forEach(function (f) {
     if (/^bg(-\d+)?\.jpg$/.test(f) && f !== bgName) fs.unlinkSync(path.join(APP_DIR, f));
   });
-  if (bgName && !isFile(path.join(APP_DIR, bgName))) fs.copyFileSync(wp, path.join(APP_DIR, bgName));
+  if (bgName && !isFile(path.join(APP_DIR, bgName))) copyFile(wp, path.join(APP_DIR, bgName));
   settings.wallpaper = bgName;
   fs.writeFileSync(path.join(APP_DIR, 'user.js'),
     '// Generated on the TV by sync.js from ' + DATA + '/settings.json\n' +

@@ -340,6 +340,8 @@ Tested yours? Open an issue or a pull request to add it here.
 <summary>For developers</summary>
 
 - `app/`: the launcher, a webOS web app (HTML/CSS/ES5 JavaScript, works on Chromium 79 / webOS 6).
+- Everything in `tv/`, and the `node -e` snippets in `install.sh`, must run on **Node 0.12** (webOS 4):
+  ES5 only, and no `fs.copyFileSync`, `Buffer.from`, `Object.assign` or arrow functions.
 - `tv/sync.js`: runs on rooted TVs. Reads apps with `luna://com.webos.applicationManager/listLaunchPoints`
   and inputs with `luna://com.webos.service.eim/getAllInputStatus`, copies icons into the installed app,
   and writes `apps.js` + `user.js` (your settings).

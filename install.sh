@@ -120,9 +120,20 @@ if [ -n "$CITY" ]; then
   say "Looking up \"$CITY\" for the weather"
   Q=$(node -e 'process.stdout.write(encodeURIComponent(process.argv[1]))' "$CITY")
   GEO=$(curl -fsSL "https://geocoding-api.open-meteo.com/v1/search?name=$Q&count=1&format=json") || die "Weather lookup failed (no internet?)"
-  LAT=$(echo "$GEO" | node -e 'var s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{var r=JSON.parse(s).results[0];process.stdout.write(String(r.latitude))}catch(e){}})')
-  LON=$(echo "$GEO" | node -e 'var s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{var r=JSON.parse(s).results[0];process.stdout.write(String(r.longitude))}catch(e){}})')
-  PLACE=$(echo "$GEO" | node -e 'var s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{var r=JSON.parse(s).results[0];process.stdout.write(r.name)}catch(e){}})')
+  # ES5 on purpose: webOS 4 TVs run Node 0.12, where arrow functions are a syntax error.
+  GEOLINE=$(echo "$GEO" | node -e '
+    var s = "";
+    process.stdin.on("data", function (d) { s += d; });
+    process.stdin.on("end", function () {
+      try {
+        var r = JSON.parse(s).results[0];
+        process.stdout.write(r.latitude + " " + r.longitude + " " + r.name);
+      } catch (e) { /* city not found */ }
+    });
+  ')
+  LAT=$(echo "$GEOLINE" | cut -d' ' -f1)
+  LON=$(echo "$GEOLINE" | cut -d' ' -f2)
+  PLACE=$(echo "$GEOLINE" | cut -d' ' -f3-)
   [ -n "$LAT" ] || die "City \"$CITY\" not found. Try the English name, e.g. \"Ho Chi Minh City\"."
   ok "$PLACE ($LAT, $LON)"
 fi
