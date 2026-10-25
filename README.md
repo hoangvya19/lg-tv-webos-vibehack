@@ -331,6 +331,7 @@ reboot
 |---|---|---|---|
 | 55NANO77TPA | 6 (firmware 03.51.15) | Root | ✅ |
 | OLED55C6XLA | 26 | No root | ✅ |
+| 55UK6340PTF | 4.4 (firmware 05.50.70) | Root | ✅ since v1.1.3 |
 
 Tested yours? Open an issue or a pull request to add it here.
 

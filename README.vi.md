@@ -327,6 +327,7 @@ reboot
 |---|---|---|---|
 | 55NANO77TPA | 6 (firmware 03.51.15) | Root | ✅ |
 | OLED55C6XLA | 26 | Không root | ✅ |
+| 55UK6340PTF | 4.4 (firmware 05.50.70) | Root | ✅ từ bản v1.1.3 |
 
 Bạn đã thử trên TV khác? Tạo issue hoặc pull request để bổ sung vào bảng.
 
