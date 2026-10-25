@@ -18,7 +18,8 @@ var APP_DIR = '/media/developer/apps/usr/palm/applications/' + APP_ID;
 var DATA = '/home/root/lg-tv-vibehack';
 
 function luna(uri, payload) {
-  var out = execFileSync('luna-send', ['-n', '1', uri, JSON.stringify(payload || {})], { encoding: 'utf8', timeout: 15000 });
+  var out = execFileSync('luna-send', ['-n', '1', uri, JSON.stringify(payload || {})],
+    { encoding: 'utf8', timeout: 15000, maxBuffer: 10 * 1024 * 1024 });
   return JSON.parse(out.trim().split('\n').pop());
 }
 
@@ -39,16 +40,27 @@ var APP_DIRS = [
   '/mnt/otncabi/usr/palm/applications'
 ];
 
+function sleep(sec) { try { execFileSync('sleep', [String(sec)]); } catch (e) { /* no sleep binary */ } }
+
+// For a minute or two after boot, webOS answers with an empty app list (seen on webOS 4.4), so ask
+// again until it has one. Without this, every boot overwrote apps.js with nothing.
 function fromLuna() {
-  var res;
-  try {
-    res = luna('luna://com.webos.applicationManager/listLaunchPoints');
-  } catch (e) {
-    console.error('listLaunchPoints failed: ' + e.message);
-    return [];
+  var tries = parseInt(process.env.SYNC_TRIES || '', 10) || 12;
+  for (var i = 0; i < tries; i++) {
+    var res = null;
+    try {
+      res = luna('luna://com.webos.applicationManager/listLaunchPoints');
+    } catch (e) {
+      console.error('listLaunchPoints failed: ' + e.message);
+    }
+    if (res && res.launchPoints && res.launchPoints.length) {
+      if (i) console.error('App list ready after ' + (i * 5) + 's.');
+      return res.launchPoints;
+    }
+    if (!i) console.error('App list not ready yet: ' + JSON.stringify(res).slice(0, 200));
+    if (i < tries - 1) sleep(5);
   }
-  if (res && res.launchPoints && res.launchPoints.length) return res.launchPoints;
-  console.error('listLaunchPoints returned no apps: ' + JSON.stringify(res).slice(0, 300));
+  console.error('listLaunchPoints still empty after ' + (tries * 5) + 's.');
   return [];
 }
 
